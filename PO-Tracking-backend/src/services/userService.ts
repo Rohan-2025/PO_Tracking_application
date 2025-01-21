@@ -66,6 +66,29 @@ class UserService{
             throw new Error(`Error in Login`);
         }
     }
+    public async createUser(req : Request, res : Response){
+        try {
+            const user : IUserCreate = req.body;
+        
+            const userDetails :  IUserCreateReturn | null = await this.userRepository.getUserByName(user.name);
+            const userEmail : IUserCreateReturn | null = await this.userRepository.getUserByEmail(user.email);
+            if(!userDetails && userEmail == null){
+                const hashedPassword = await hashPassword(user.password);
+                const userObj : IUserCreate = {
+                    name : user.name,
+                    password : hashedPassword,
+                    email : user.email,
+                    role : user.role,
+                }
+                const  newUser  = await this.userRepository.createUser(userObj);
+                return res.sendFormatted(newUser,"User Created",200);
+            }else{
+                return res.sendError(null,"User Already exists",400);
+            }
+        } catch (error) {
+            throw new Error(`Error creating user`);
+        }
+    }
 }
 
 

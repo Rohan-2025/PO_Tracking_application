@@ -5,8 +5,8 @@ import User from "../models/userModel";
 class UserRepository{
     public async createUser(user : IUserCreate) : Promise<IUserCreate | null> {
         try{
-            const newUser: IUserCreate = await User.create(user);
-            return newUser;
+            const newUser = await User.create(user);
+            return newUser.toObject();
         }catch(error : any){
             throw new Error(error);
         }
@@ -17,6 +17,14 @@ class UserRepository{
             return user ? true : false;
         } catch (error: any) {
             throw new Error(error);
+        }
+    }
+    public async getUserByEmail(email : string) : Promise<any | null> {
+        try{
+            const user = await User.findOne({ email } ).lean();
+            return user;
+        }catch(error : any){
+            throw new Error("No user found");
         }
     }
     public async getUserByName(name : string) : Promise<any | null> {
